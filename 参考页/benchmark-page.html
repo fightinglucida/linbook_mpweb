@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>林书公众号助手 - 对标账号库</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(to bottom, #1a2e3b, #0f4a30);
+            min-height: 100vh;
+            font-family: "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        .nav-link {
+            position: relative;
+            transition: all 0.3s;
+        }
+        .nav-link:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: #fff;
+            transition: width 0.3s;
+        }
+        .nav-link:hover:after, .nav-link.active:after {
+            width: 100%;
+        }
+        .category-btn {
+            transition: all 0.3s;
+        }
+        .category-btn.active {
+            background-color: #059669;
+            color: white;
+        }
+        .category-btn:hover:not(.active) {
+            background-color: rgba(5, 150, 105, 0.1);
+        }
+        .account-card {
+            transition: all 0.3s;
+        }
+        .account-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .modal {
+            transition: opacity 0.3s ease;
+        }
+    </style>
+</head>
+<body class="text-white">
+    <!-- 导航栏 -->
+    <header class="bg-gray-900 shadow-md">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <h1 class="text-xl font-bold">林书公众号助手</h1>
+            </div>
+            <nav class="hidden md:flex space-x-8">
+                <a href="/" class="nav-link">首页</a>
+                <a href="/benchmark" class="nav-link active">对标账号库</a>
+                <a href="/batch-collect" class="nav-link">批量采集</a>
+                <a href="/batch-edit" class="nav-link">批量改写</a>
+                <a href="/contact" class="nav-link">联系我</a>
+            </nav>
+            <div class="flex space-x-3">
+                <button class="bg-green-600 hover:bg-green-700 text-white py-1 px-4 rounded transition duration-300">下载</button>
+                <button class="bg-blue-600 hover:bg-blue-700 text-white py-1 px-4 rounded transition duration-300">登录</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容 -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="mb-6 text-center">
+            <h2 class="text-3xl font-bold mb-2">对标账号库</h2>
+            <p class="text-gray-300">发现优质公众号，分析阅读数据，助力内容创作</p>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-6">
+            <!-- 左侧分类 -->
+            <div class="w-full md:w-1/5 bg-gray-800 bg-opacity-50 rounded-lg p-4">
+                <h3 class="text-xl font-bold mb-4 border-b border-gray-700 pb-2">公众号分类</h3>
+                <div class="space-y-2">
+                    <button class="category-btn active w-full text-left px-4 py-2 rounded-md">全部分类</button>
+                    <button class="category-btn w-full text-left px-4 py-2 rounded-md">情感</button>
+                    <button class="category-btn w-full text-left px-4 py-2 rounded-md">老年</button>
+                    <button class="category-btn w-full text-left px-4 py-2 rounded-md">热点</button>
+                    <button class="category-btn w-full text-left px-4 py-2 rounded-md">科技</button>
+                    <button class="category-btn w-full text-left px-4 py-2 rounded-md">手机</button>
+                    <button class="category-btn w-full text-left px-4 py-2 rounded-md">汽车</button>
+                    <button class="category-btn w-full text-left px-4 py-2 rounded-md">观点</button>
+                    <button class="category-btn w-full text-left px-4 py-2 rounded-md">育儿</button>
+                    <button class="category-btn w-full text-left px-4 py-2 rounded-md">健康</button>
+                    <button class="category-btn w-full text-left px-4 py-2 rounded-md">财经</button>
+                    <button class="category-btn w-full text-left px-4 py-2 rounded-md">教育</button>
+                </div>
+            </div>
+
+            <!-- 右侧公众号卡片 -->
+            <div class="w-full md:w-4/5">
+                <div class="mb-4 flex justify-between items-center">
+                    <h3 class="text-xl font-bold">热门公众号</h3>
+                    <div class="flex items-center">
+                        <span class="mr-2">排序:</span>
+                        <select class="bg-gray-700 text-white rounded p-1 focus:outline-none">
+                            <option>阅读量 ↓</option>
+                            <option>阅读量 ↑</option>
+                            <option>最新更新</option>
+                            <option>名称排序</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 卡片网格 -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                    <!-- 卡片1 -->
+                    <div class="account-card bg-gray-800 rounded-lg overflow-hidden shadow-lg cursor-pointer" onclick="openModal('modal1')">
+                        <div class="p-4">
+                            <div class="flex items-center mb-3">
+                                <img src="https://cdnjs.cloudflare.com/api/placeholder/40/40" class="w-10 h-10 rounded-full mr-3" alt="头像">
+                                <h4 class="font-bold truncate">创业邦</h4>
+                            </div>
+                            <div class="flex justify-between text-sm text-gray-300">
+                                <span>近7日阅读:</span>
+                                <span class="font-bold text-green-500">152.6万+</span>
+                            </div>
+                            <div class="flex justify-between text-sm text-gray-300 mt-1">
+                                <span>更新频率:</span>
+                                <span>每日更新</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 卡片2 -->
+                    <div class="account-card bg-gray-800 rounded-lg overflow-hidden shadow-lg cursor-pointer" onclick="openModal('modal2')">
+                        <div class="p-4">
+                            <div class="flex items-center mb-3">
+                                <img src="https://cdnjs.cloudflare.com/api/placeholder/40/40" class="w-10 h-10 rounded-full mr-3" alt="头像">
+                                <h4 class="font-bold truncate">36氪</h4>
+                            </div>
+                            <div class="flex justify-between text-sm text-gray-300">
+                                <span>近7日阅读:</span>
+                                <span class="font-bold text-green-500">203.8万+</span>
+                            </div>
+                            <div class="flex justify-between text-sm text-gray-300 mt-1">
+                                <span>更新频率:</span>
+                                <span>每日更新</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 卡片3 -->
+                    <div class="account-card bg-gray-800 rounded-lg overflow-hidden shadow-lg cursor-pointer" onclick="openModal('modal3')">
+                        <div class="p-4">
+                            <div class="flex items-center mb-3">
+                                <img src="https://cdnjs.cloudflare.com/api/placeholder/40/40" class="w-10 h-10 rounded-full mr-3" alt="头像">
+                                <h4 class="font-bold truncate">量子位</h4>
+                            </div>
+                            <div class="flex justify-between text-sm text-gray-300">
+                                <span>近7日阅读:</span>
+                                <span class="font-bold text-green-500">186.2万+</span>
+                            </div>
+                            <div class="flex justify-between text-sm text-gray-300 mt-1">
+                                <span>更新频率:</span>
+                                <span>每日更新</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 卡片4 -->
+                    <div class="account-card bg-gray-800 rounded-lg overflow-hidden shadow-lg cursor-pointer">
+                        <div class="p-4">
+                            <div class="flex items-center mb-3">
+                                <img src="https://cdnjs.cloudflare.com/api/placeholder/40/40" class="w-10 h-10 rounded-full mr-3" alt="头像">
+                                <h4 class="font-bold truncate">人民日报</h4>
+                            </div>
+                            <div class="flex justify-between text-sm text-gray-300">
+                                <span>近7日阅读:</span>
+                                <span class="font-bold text-green-500">458.1万+</span>
+                            </div>
+                            <div class="flex justify-between text-sm text-gray-300 mt-1">
+                                <span>更新频率:</span>
+                                <span>每日多次</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 卡片5 -->
+                    <div class="account-card bg-gray-800 rounded-lg overflow-hidden shadow-lg cursor-pointer">
+                        <div class="p-4">
+                            <div class="flex items-center mb-3">
+                                <img src="https://cdnjs.cloudflare.com/api/placeholder/40/40" class="w-10 h-10 rounded-full mr-3" alt="头像">
+                                <h4 class="font-bold truncate">新华社</h4>
+                            </div>
+                            <div class="flex justify-between text-sm text-gray-300">
+                                <span>近7日阅读:</span>
+                                <span class="font-bold text-green-500">382.5万+</span>
+                            </div>
+                            <div class="flex justify-between text-sm text-gray-300 mt-1">
+                                <span>更新频率:</span>
+                                <span>每日多次</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 卡片6 -->
+                    <div class="account-card bg-gray-800 rounded-lg overflow-hidden shadow-lg cursor-pointer">
+                        <div class="p-4">
+                            <div class="flex items-center mb-3">
+                                <img src="https://cdnjs.cloudflare.com/api/placeholder/40/40" class="w-10 h-10 rounded-full mr-3" alt="头像">
+                                <h4 class="font-bold truncate">科技美学</h4>
+                            </div>
+                            <div class="flex justify-between text-sm text-gray-300">
+                                <span>近7日阅读:</span>
+                                <span class="font-bold text-green-500">98.7万+</span>
+                            </div>
+                            <div class="flex justify-between text-sm text-gray-300 mt-1">
+                                <span>更新频率:</span>
+                                <span>每周更新</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 卡片7 -->
+                    <div class="account-card bg-gray-800 rounded-lg overflow-hidden shadow-lg cursor-pointer">
+                        <div class="p-4">
+                            <div class="flex items-center mb-3">
+                                <img src="https://cdnjs.cloudflare.com/api/placeholder/40/40" class="w-10 h-10 rounded-full mr-3" alt="头像">
+                                <h4 class="font-bold truncate">读者</h4>
+                            </div>
+                            <div class="flex justify-between text-sm text-gray-300">
+                                <span>近7日阅读:</span>
+                                <span class="font-bold text-green-500">126.4万+</span>
+                            </div>
+                            <div class="flex justify-between text-sm text-gray-300 mt-1">
+                                <span>更新频率:</span>
+                                <span>每日更新</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 卡片8 -->
+                    <div class="account-card bg-gray-800 rounded-lg overflow-hidden shadow-lg cursor-pointer">
+                        <div class="p-4">
+                            <div class="flex items-center mb-3">
+                                <img src="https://cdnjs.cloudflare.com/api/placeholder/40/40" class="w-10 h-10 rounded-full mr-3" alt="头像">
+                                <h4 class="font-bold truncate">Vista看天下</h4>
+                            </div>
+                            <div class="flex justify-between text-sm text-gray-300">
+                                <span>近7日阅读:</span>
+                                <span class="font-bold text-green-500">115.2万+</span>
+                            </div>
+                            <div class="flex justify-between text-sm text-gray-300 mt-1">
+                                <span>更新频率:</span>
+                                <span>每日更新</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 卡片9 -->
+                    <div class="account-card bg-gray-800 rounded-lg overflow-hidden shadow-lg cursor-pointer">
+                        <div class="p-4">
+                            <div class="flex items-center mb-3">
+                                <img src="https://cdnjs.cloudflare.com/api/placeholder/40/40" class="w-10 h-10 rounded-full mr-3" alt="头像">
+                                <h4 class="font-bold truncate">钛媒体</h4>
+                            </div>
+                            <div class="flex justify-between text-sm text-gray-300">
+                                <span>近7日阅读:</span>
+                                <span class="font-bold text-green-500">134.9万+</span>
+                            </div>
+                            <div class="flex justify-between text-sm text-gray-300 mt-1">
+                                <span>更新频率:</span>
+                                <span>每日更新</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 卡片10 -->
+                    <div class="account-card bg-gray-800 rounded-lg overflow-hidden shadow-lg cursor-pointer">
+                        <div class="p-4">
+                            <div class="flex items-center mb-3">
+                                <img src="https://cdnjs.cloudflare.com/api/placeholder/40/40" class="w-10 h-10 rounded-full mr-3" alt="头像">
+                                <h4 class="font-bold truncate">虎嗅网</h4>
+                            </div>
+                            <div class="flex justify-between text-sm text-gray-300">
+                                <span>近7日阅读:</span>
+                                <span class="font-bold text-green-500">167.3万+</span>
+                            </div>
+                            <div class="flex justify-between text-sm text-gray-300 mt-1">
+                                <span>更新频率:</span>
+                                <span>每日更新</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 分页 -->
+                <div class="mt-8 flex justify-center">
+                    <nav class="flex items-center space-x-2">
+                        <a href="#" class="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600">上一页</a>
+                        <a href="#" class="px-3 py-1 rounded bg-green-600">1</a>
+                        <a href="#" class="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600">2</a>
+                        <a href="#" class="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600">3</a>
+                        <span class="px-2">...</span>
+                        <a href="#" class="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600">10</a>
+                        <a href="#" class="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600">下一页</a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 详情弹窗1 -->
+    <div id="modal1" class="modal fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+        <div class="bg-gray-800 rounded-lg w-full max-w-4xl max-h-screen overflow-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-6">
+                    <div class="flex items-center">
+                        <img src="https://cdnjs.cloudflare.com/api/placeholder/60/60" class="w-16 h-16 rounded-full mr-4" alt="头像">
+                        <div>
+                            <h3 class="text-2xl font-bold">创业邦</h3>
+                            <p class="text-gray-400">ID: chuangyebang</p>
+                            <div class="flex space-x-4 mt-2">
+                                <span class="text-green-500">7日阅读: 152.6万+</span>
+                                <span class="text-blue-400">粉丝数: 约450万</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="closeModal('modal1')" class="text-gray-400 hover:text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="text-lg font-bold mb-2">公众号简介</h4>
+                    <p class="text-gray-300">创业邦是中国领先的创业服务平台，专注报道互联网创业、科技创新，致力服务创业者和创新企业。</p>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-bold mb-4">近期文章</h4>
+                    <div class="space-y-4">
+                        <div class="p-3 bg-gray-700 bg-opacity-50 rounded-lg">
+                            <h5 class="font-bold mb-2">互联网巨头进军AI芯片，这家公司估值翻倍</h5>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">2023-10-13</span>
+                                <span class="text-green-500">阅读: 13.7万+</span>
+                            </div>
+                            <a href="#" class="text-blue-400 text-sm hover:underline mt-1 block">http://mp.weixin.qq.com/s?__biz=...</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-end">
+                    <button class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded mr-2">采集文章</button>
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded" onclick="closeModal('modal2')">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 详情弹窗3 -->
+    <div id="modal3" class="modal fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+        <div class="bg-gray-800 rounded-lg w-full max-w-4xl max-h-screen overflow-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-6">
+                    <div class="flex items-center">
+                        <img src="https://cdnjs.cloudflare.com/api/placeholder/60/60" class="w-16 h-16 rounded-full mr-4" alt="头像">
+                        <div>
+                            <h3 class="text-2xl font-bold">量子位</h3>
+                            <p class="text-gray-400">ID: QbitAI</p>
+                            <div class="flex space-x-4 mt-2">
+                                <span class="text-green-500">7日阅读: 186.2万+</span>
+                                <span class="text-blue-400">粉丝数: 约620万</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="closeModal('modal3')" class="text-gray-400 hover:text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="text-lg font-bold mb-2">公众号简介</h4>
+                    <p class="text-gray-300">量子位是国内领先的人工智能媒体，专注AI前沿技术报道，探索科技创新趋势。</p>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-bold mb-4">近期文章</h4>
+                    <div class="space-y-4">
+                        <div class="p-3 bg-gray-700 bg-opacity-50 rounded-lg">
+                            <h5 class="font-bold mb-2">OpenAI发布重磅模型Sora：文本生成视频</h5>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">2024-02-18</span>
+                                <span class="text-green-500">阅读: 15.6万+</span>
+                            </div>
+                            <a href="#" class="text-blue-400 text-sm hover:underline mt-1 block">http://mp.weixin.qq.com/s?__biz=...</a>
+                        </div>
+
+                        <div class="p-3 bg-gray-700 bg-opacity-50 rounded-lg">
+                            <h5 class="font-bold mb-2">谷歌最强AI模型Gemini发布，GPT-4迎来最强挑战</h5>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">2023-10-20</span>
+                                <span class="text-green-500">阅读: 14.7万+</span>
+                            </div>
+                            <a href="#" class="text-blue-400 text-sm hover:underline mt-1 block">http://mp.weixin.qq.com/s?__biz=...</a>
+                        </div>
+
+                        <div class="p-3 bg-gray-700 bg-opacity-50 rounded-lg">
+                            <h5 class="font-bold mb-2">AI芯片独角兽，估值超200亿，将IPO</h5>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">2023-10-18</span>
+                                <span class="text-green-500">阅读: 13.2万+</span>
+                            </div>
+                            <a href="#" class="text-blue-400 text-sm hover:underline mt-1 block">http://mp.weixin.qq.com/s?__biz=...</a>
+                        </div>
+
+                        <div class="p-3 bg-gray-700 bg-opacity-50 rounded-lg">
+                            <h5 class="font-bold mb-2">一觉醒来，AI将颠覆所有搜索引擎</h5>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">2023-10-16</span>
+                                <span class="text-green-500">阅读: 16.8万+</span>
+                            </div>
+                            <a href="#" class="text-blue-400 text-sm hover:underline mt-1 block">http://mp.weixin.qq.com/s?__biz=...</a>
+                        </div>
+
+                        <div class="p-3 bg-gray-700 bg-opacity-50 rounded-lg">
+                            <h5 class="font-bold mb-2">华人科学家突破性成果：AI药物研发再获新进展</h5>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">2023-10-14</span>
+                                <span class="text-green-500">阅读: 12.4万+</span>
+                            </div>
+                            <a href="#" class="text-blue-400 text-sm hover:underline mt-1 block">http://mp.weixin.qq.com/s?__biz=...</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-end">
+                    <button class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded mr-2">采集文章</button>
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded" onclick="closeModal('modal3')">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-900 mt-10 py-6">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <p class="text-gray-400 text-sm">© 2023-2025 林书公众号助手 版权所有</p>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-white text-sm">使用条款</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm">隐私政策</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm">联系我们</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 模态框开关
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+        
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+        
+        // 分类按钮点击效果
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>bg-gray-700 bg-opacity-50 rounded-lg">
+                            <h5 class="font-bold mb-2">2.2亿美元！清华姚班天才创办的AI公司卖身</h5>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">2023-10-20</span>
+                                <span class="text-green-500">阅读: 12.4万+</span>
+                            </div>
+                            <a href="#" class="text-blue-400 text-sm hover:underline mt-1 block">http://mp.weixin.qq.com/s?__biz=...</a>
+                        </div>
+
+                        <div class="p-3 bg-gray-700 bg-opacity-50 rounded-lg">
+                            <h5 class="font-bold mb-2">投资人疯抢的AI医疗公司，估值50亿</h5>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">2023-10-18</span>
+                                <span class="text-green-500">阅读: 10.8万+</span>
+                            </div>
+                            <a href="#" class="text-blue-400 text-sm hover:underline mt-1 block">http://mp.weixin.qq.com/s?__biz=...</a>
+                        </div>
+
+                        <div class="p-3 bg-gray-700 bg-opacity-50 rounded-lg">
+                            <h5 class="font-bold mb-2">独角兽创始人卸任CEO，背后发生了什么？</h5>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">2023-10-15</span>
+                                <span class="text-green-500">阅读: 9.2万+</span>
+                            </div>
+                            <a href="#" class="text-blue-400 text-sm hover:underline mt-1 block">http://mp.weixin.qq.com/s?__biz=...</a>
+                        </div>
+
+                        <div class="p-3 bg-gray-700 bg-opacity-50 rounded-lg">
+                            <h5 class="font-bold mb-2">最前线 | 滴滴顺风车重新上线，设置搭车记录分享等安全措施</h5>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">2023-10-14</span>
+                                <span class="text-green-500">阅读: 8.6万+</span>
+                            </div>
+                            <a href="#" class="text-blue-400 text-sm hover:underline mt-1 block">http://mp.weixin.qq.com/s?__biz=...</a>
+                        </div>
+
+                        <div class="p-3 bg-gray-700 bg-opacity-50 rounded-lg">
+                            <h5 class="font-bold mb-2">IPO前，被腾讯阿里争抢的它，估值蒸发近80%</h5>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">2023-10-12</span>
+                                <span class="text-green-500">阅读: 11.2万+</span>
+                            </div>
+                            <a href="#" class="text-blue-400 text-sm hover:underline mt-1 block">http://mp.weixin.qq.com/s?__biz=...</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-end">
+                    <button class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded mr-2">采集文章</button>
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded" onclick="closeModal('modal1')">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 详情弹窗2 -->
+    <div id="modal2" class="modal fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+        <div class="bg-gray-800 rounded-lg w-full max-w-4xl max-h-screen overflow-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-6">
+                    <div class="flex items-center">
+                        <img src="https://cdnjs.cloudflare.com/api/placeholder/60/60" class="w-16 h-16 rounded-full mr-4" alt="头像">
+                        <div>
+                            <h3 class="text-2xl font-bold">36氪</h3>
+                            <p class="text-gray-400">ID: krcom36</p>
+                            <div class="flex space-x-4 mt-2">
+                                <span class="text-green-500">7日阅读: 203.8万+</span>
+                                <span class="text-blue-400">粉丝数: 约830万</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="closeModal('modal2')" class="text-gray-400 hover:text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="text-lg font-bold mb-2">公众号简介</h4>
+                    <p class="text-gray-300">36氪是中国领先的新商业媒体，提供创新创业资讯和服务，致力于帮助创业者实现商业梦想。</p>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-bold mb-4">近期文章</h4>
+                    <div class="space-y-4">
+                        <div class="p-3 bg-gray-700 bg-opacity-50 rounded-lg">
+                            <h5 class="font-bold mb-2">独家丨字节跳动收购AI初创公司Manus</h5>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">2023-10-21</span>
+                                <span class="text-green-500">阅读: 15.6万+</span>
+                            </div>
+                            <a href="#" class="text-blue-400 text-sm hover:underline mt-1 block">http://mp.weixin.qq.com/s?__biz=...</a>
+                        </div>
+
+                        <div class="p-3 bg-gray-700 bg-opacity-50 rounded-lg">
+                            <h5 class="font-bold mb-2">爆款视频App发布，TikTok的又一个对手来了</h5>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">2023-10-19</span>
+                                <span class="text-green-500">阅读: 12.8万+</span>
+                            </div>
+                            <a href="#" class="text-blue-400 text-sm hover:underline mt-1 block">http://mp.weixin.qq.com/s?__biz=...</a>
+                        </div>
+
+                        <div class="p-3 bg-gray-700 bg-opacity-50 rounded-lg">
+                            <h5 class="font-bold mb-2">市值蒸发8000亿，巨头大裁员的背后</h5>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">2023-10-17</span>
+                                <span class="text-green-500">阅读: 14.2万+</span>
+                            </div>
+                            <a href="#" class="text-blue-400 text-sm hover:underline mt-1 block">http://mp.weixin.qq.com/s?__biz=...</a>
+                        </div>
+
+                        <div class="p-3 bg-gray-700 bg-opacity-50 rounded-lg">
+                            <h5 class="font-bold mb-2">24岁CEO创业4年身家百亿，独家揭秘暴涨背后的真相</h5>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">2023-10-15</span>
+                                <span class="text-green-500">阅读: 18.3万+</span>
+                            </div>
+                            <a href="#" class="text-blue-400 text-sm hover:underline mt-1 block">http://mp.weixin.qq.com/s?__biz=...</a>
+                        </div>
+
+                        <div class="p-3 
