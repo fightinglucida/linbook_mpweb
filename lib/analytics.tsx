@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
 import Script from 'next/script';
+import { Fragment } from 'react';
 
 // Google Analytics 测量 ID
 export const GA_MEASUREMENT_ID = 'G-B2KTKL2C8F'; // 替换为你的 Google Analytics 测量 ID
@@ -9,14 +9,13 @@ export const GA_MEASUREMENT_ID = 'G-B2KTKL2C8F'; // 替换为你的 Google Analy
 // 初始化 Google Analytics
 export const GoogleAnalytics = () => {
   return (
-    <>
+    <Fragment>
       <Script
         strategy="afterInteractive"
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
       />
       <Script
         id="google-analytics"
-        strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `
             window.dataLayer = window.dataLayer || [];
@@ -26,7 +25,7 @@ export const GoogleAnalytics = () => {
           `,
         }}
       />
-    </>
+    </Fragment>
   );
 };
 
