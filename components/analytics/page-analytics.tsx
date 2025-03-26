@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { pageview } from '@/lib/analytics';
 
-export function PageAnalytics() {
+// 创建一个内部组件来使用 useSearchParams
+function AnalyticsContent() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -14,4 +15,12 @@ export function PageAnalytics() {
   }, [pathname, searchParams]);
 
   return null;
+}
+
+export function PageAnalytics() {
+  return (
+    <Suspense fallback={null}>
+      <AnalyticsContent />
+    </Suspense>
+  );
 }
