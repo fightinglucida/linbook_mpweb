@@ -10,8 +10,16 @@ function AnalyticsContent() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const url = pathname + searchParams.toString();
-    pageview(url);
+    try {
+      // 使用 URL 对象处理 URL，避免编码问题
+      const search = searchParams.toString();
+      const fullPath = search ? `${pathname}?${search}` : pathname;
+      // 确保 URL 正确编码
+      const encodedUrl = encodeURI(fullPath);
+      pageview(encodedUrl);
+    } catch (error) {
+      console.error('Analytics error:', error);
+    }
   }, [pathname, searchParams]);
 
   return null;
