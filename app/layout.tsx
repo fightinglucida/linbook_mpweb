@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { GoogleAnalytics } from '@/lib/analytics'
+import { PageAnalytics } from '@/components/analytics/page-analytics'
 
 export const metadata: Metadata = {
   title: '林书公众号助手',
@@ -14,7 +16,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <PageAnalytics />
+        {children}
+        <GoogleAnalytics />
+      </body>
     </html>
   )
 }
