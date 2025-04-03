@@ -1,0 +1,22 @@
+[
+  {
+    "avatar": "/placeholder.jpg",
+    "name": "创业邦",
+    "readCount": 1526000,
+    "category": "科技",
+    "articles": [
+      { "title": "互联网巨头进军AI芯片", "readCount": 137000 },
+      { "title": "AI公司估值翻倍", "readCount": 124000 }
+    ]
+  },
+  {
+    "avatar": "/placeholder.jpg",
+    "name": "财经杂志",
+    "readCount": 2156000,
+    "category": "财经",
+    "articles": [
+      { "title": "新能源汽车产业链分析", "readCount": 168000 },
+      { "title": "房地产市场新政策解读", "readCount": 145000 }
+    ]
+  }
+]

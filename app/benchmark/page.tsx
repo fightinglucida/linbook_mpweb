@@ -4,163 +4,41 @@ import Link from "next/link"
 import NavBar from "@/components/nav-bar"
 import { Button } from "@/components/ui/button"
 import LoginModal from "@/components/login-modal"
-import React from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
+import { 
+  GlobeAltIcon, 
+  CpuChipIcon, 
+  BanknotesIcon, 
+  HeartIcon as HeartIconSolid, 
+  AcademicCapIcon, 
+  UserGroupIcon, 
+  FireIcon, 
+  DevicePhoneMobileIcon, 
+  TruckIcon, 
+  ChatBubbleLeftRightIcon, 
+  FaceSmileIcon 
+} from '@heroicons/react/24/solid';
 
-// 获取分类数据
-const getCategories = () => {
-  return ['全部分类', '情感', '老年', '热点', '科技', '手机', '汽车', '观点', '育儿', '健康', '财经', '教育'];
+// 定义 Icon 类型
+type IconType = React.ForwardRefExoticComponent<Omit<React.SVGProps<SVGSVGElement>, "ref"> & { title?: string | undefined; titleId?: string | undefined; } & React.RefAttributes<SVGSVGElement>>;
+
+// 创建分类到图标的映射
+const categoryIconMap: Record<string, IconType> = {
+  '全部': GlobeAltIcon,
+  '科技': CpuChipIcon,
+  '财经': BanknotesIcon,
+  '健康': HeartIconSolid,
+  '教育': AcademicCapIcon,
+  '情感': HeartIconSolid, 
+  '老年': UserGroupIcon,
+  '热点': FireIcon,
+  '手机': DevicePhoneMobileIcon,
+  '汽车': TruckIcon,
+  '观点': ChatBubbleLeftRightIcon,
+  '育儿': FaceSmileIcon, 
 };
 
-// 获取公众号数据
-const getAccounts = () => {
-  return [
-    {
-      avatar: '/placeholder.jpg',
-      name: '创业邦',
-      readCount: 1526000,
-      articles: [
-        { title: '互联网巨头进军AI芯片，这家公司估值翻倍', readCount: 137000 },
-        { title: '2.2亿美元！清华姚班天才创办的AI公司卖身', readCount: 124000 },
-        { title: '投资人疯抢的AI医疗公司，估值50亿', readCount: 108000 },
-        { title: '独家专访：AI创业者的成功之路', readCount: 98000 },
-        { title: '创投周报：新一轮融资hotspots来袭', readCount: 92000 },
-        { title: '深度分析：中国创业生态的变革之年', readCount: 88000 },
-        { title: '创业者必读：如何打造百亿估值企业', readCount: 85000 }
-      ]
-    },
-    {
-      avatar: '/placeholder.jpg',
-      name: '36氪',
-      readCount: 2038000,
-      articles: [
-        { title: '独家丨字节跳动收购AI初创公司Manus', readCount: 156000 },
-        { title: '爆款视频App发布，TikTok的又一个对手来了', readCount: 128000 },
-        { title: '市值蒸发8000亿，巨头大裁员的背后', readCount: 142000 },
-        { title: '36氪首发｜新能源汽车独角兽完成10亿融资', readCount: 118000 },
-        { title: '解密：互联网巨头的元宇宙布局', readCount: 105000 },
-        { title: '科技巨头财报解读：AI业务成新增长点', readCount: 98000 },
-        { title: '独家对话：硅谷投资人眼中的中国创新', readCount: 92000 }
-      ]
-    },
-    {
-      avatar: '/placeholder.jpg',
-      name: '量子位',
-      readCount: 1862000,
-      articles: [
-        { title: 'OpenAI发布重磅模型Sora：文本生成视频', readCount: 156000 },
-        { title: '谷歌最强AI模型Gemini发布，GPT-4coming soon', readCount: 147000 },
-        { title: 'AI芯片独角兽，估值超200亿，将IPO', readCount: 132000 },
-        { title: '最新突破：量子计算机实现千比特里程碑', readCount: 125000 },
-        { title: 'AI研究最新进展：自主学习能力大幅提升', readCount: 118000 },
-        { title: '深度解析：大模型训练的技术创新', readCount: 110000 },
-        { title: '独家：国内AI实验室取得重大突破', readCount: 105000 }
-      ]
-    },
-    {
-      avatar: '/placeholder.jpg',
-      name: '人民日报',
-      readCount: 4581000,
-      articles: [
-        { title: '两会特别报道：科技创新引领QUALITY提升', readCount: 245000 },
-        { title: '中国经济新动能：数字经济驱动转型hotspots转型', readCount: 198000 },
-        { title: '聚焦乡村振兴：数字化赋能农业现代化', readCount: 185000 },
-        { title: '深度观察：共同富裕道路上的中国实践', readCount: 176000 },
-        { title: '权威解读：新发展格局下的改革开放', readCount: 165000 },
-        { title: '民生聚焦：教育医疗住房三大领域改革', readCount: 158000 },
-        { title: '全球视野：构建人类命运共同体', readCount: 152000 }
-      ]
-    },
-    {
-      avatar: '/placeholder.jpg',
-      name: '新华社',
-      readCount: 3825000,
-      articles: [
-        { title: '聚焦两会：代表委员热议科技自立自强', readCount: 215000 },
-        { title: '深度观察：中国制造迈向中国创造', readCount: 186000 },
-        { title: '权威解读：新时代中国特色社会主义', readCount: 175000 },
-        { title: '全球瞭望：世界格局加速演变', readCount: 168000 },
-        { title: '经济透视：QUALITY提升的新进展', readCount: 162000 },
-        { title: '民生关注：共同富裕新进展', readCount: 155000 },
-        { title: '科技创新：中国智造新突破', readCount: 148000 }
-      ]
-    },
-    {
-      avatar: '/placeholder.jpg',
-      name: '财经杂志',
-      readCount: 2156000,
-      articles: [
-        { title: '独家调查：新能源汽车产业链深度分析', readCount: 168000 },
-        { title: '房地产市场新政策解读：重点城市将迎来新机遇', readCount: 145000 },
-        { title: '数字人民币试点扩大，金融科技创新加速', readCount: 132000 },
-        { title: '宏观经济分析：通胀压力下的货币政策', readCount: 128000 },
-        { title: '产业观察：芯片产业国产化进程加快', readCount: 122000 },
-        { title: '金融改革：资本市场全面注册制时代', readCount: 118000 },
-        { title: '公司研究：互联网巨头转型新方向', readCount: 115000 }
-      ]
-    },
-    {
-      avatar: '/placeholder.jpg',
-      name: '虎嗅网',
-      readCount: 1935000,
-      articles: [
-        { title: '新消费品牌崛起：00后消费习惯大解析', readCount: 143000 },
-        { title: '互联网医疗的春天：政策利好下的机遇与挑战', readCount: 126000 },
-        { title: '元宇宙概念降温，资本市场转向何方？', readCount: 118000 },
-        { title: '深度：社交平台的去中心化趋势', readCount: 112000 },
-        { title: '观察：新一代创业者的生存法则', readCount: 108000 },
-        { title: '独家：to B领域的创新机会', readCount: 102000 },
-        { title: '解密：互联网大厂的新增长曲线', readCount: 98000 }
-      ]
-    },
-    {
-      avatar: '/placeholder.jpg',
-      name: '教育视点',
-      readCount: 1658000,
-      articles: [
-        { title: 'AI教育革命：智能化学习平台改变传统课堂', readCount: 125000 },
-        { title: '双减政策一年后：教育行业格局重构', readCount: 118000 },
-        { title: '高考改革新方向：综合素质评价体系完善', readCount: 106000 },
-        { title: '深度：在线教育的下一个风口', readCount: 98000 },
-        { title: '观察：教育公平的数字化实践', readCount: 92000 },
-        { title: '独家：未来教育的发展趋势', readCount: 88000 },
-        { title: '聚焦：国际教育合作新机遇', readCount: 85000 }
-      ]
-    },
-    {
-      avatar: '/placeholder.jpg',
-      name: '科技日报',
-      readCount: 2245000,
-      articles: [
-        { title: '国产芯片突破：14nm工艺实现量产', readCount: 178000 },
-        { title: '量子通信网络建设提速：多地启动试点', readCount: 156000 },
-        { title: '航天技术创新：新一代运载火箭研制成功', readCount: 142000 },
-        { title: '深度：6G技术研发最新进展', readCount: 135000 },
-        { title: '独家：国产操作系统发展现状', readCount: 128000 },
-        { title: '聚焦：人工智能芯片新突破', readCount: 122000 },
-        { title: '观察：科技创新助力碳中和', readCount: 118000 }
-      ]
-    },
-    {
-      avatar: '/placeholder.jpg',
-      name: '健康时报',
-      readCount: 1876000,
-      articles: [
-        { title: '最新研究：这些食物有助于预防认知障碍', readCount: 146000 },
-        { title: '专家解读：如何科学应对亚健康', readCount: 132000 },
-        { title: '重大突破：新型癌症早筛技术获批上市', readCount: 128000 },
-        { title: '深度：后疫情时代的健康管理', readCount: 122000 },
-        { title: '独家：精准医疗领域新进展', readCount: 118000 },
-        { title: '观察：中医药创新发展之路', readCount: 112000 },
-        { title: '聚焦：智慧医疗改变就医体验', readCount: 108000 }
-      ]
-    }
-  ];
-};
-
-const categories = getCategories();
-const accounts = getAccounts();
-
-// 公众号详情弹窗组件
+// 定义数据类型接口
 interface Article {
   title: string;
   readCount: number;
@@ -171,8 +49,10 @@ interface Account {
   name: string;
   readCount: number;
   articles: Article[];
+  category: string; 
 }
 
+// 公众号详情弹窗组件
 interface AccountDetailModalProps {
   account: Account;
   open: boolean;
@@ -181,14 +61,25 @@ interface AccountDetailModalProps {
 
 const AccountDetailModal: React.FC<AccountDetailModalProps> = ({ account, open, onClose }) => {
   if (!open) return null;
+  if (!account) return null; 
+
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl mx-4 overflow-hidden">
         <div className="p-6 border-b border-gray-100">
           <div className="flex items-center space-x-4">
-            <img src={account.avatar} alt={account.name} className="w-16 h-16 rounded-xl object-cover" />
-            <div className="flex-1">
-              <h2 className="text-xl font-semibold text-gray-900">{account.name}</h2>
+            <img 
+              src={account.avatar || '/default-avatar.png'} 
+              alt={account.name}
+              className="w-16 h-16 rounded-xl object-cover flex-shrink-0" 
+              onError={(e) => { 
+                if (e.currentTarget.src !== '/default-avatar.png') {
+                  e.currentTarget.src = '/default-avatar.png'; 
+                }
+              }} 
+            />
+            <div className="flex-1 min-w-0"> 
+              <h2 className="text-xl font-semibold text-gray-900 truncate">{account.name}</h2>
               <div className="flex items-center mt-1 text-sm text-gray-500">
                 <span>过去7天阅读总量: </span>
                 <span className="font-medium text-gray-900 ml-1">{account.readCount.toLocaleString()}</span>
@@ -204,7 +95,6 @@ const AccountDetailModal: React.FC<AccountDetailModalProps> = ({ account, open, 
             </button>
           </div>
         </div>
-
         <div className="p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">过去7天文章数据</h3>
           <div className="space-y-4">
@@ -231,84 +121,173 @@ const AccountDetailModal: React.FC<AccountDetailModalProps> = ({ account, open, 
 };
 
 export default function Benchmark() {
-  const [selectedAccount, setSelectedAccount] = React.useState<Account | null>(null);
-  const [searchQuery, setSearchQuery] = React.useState('');
-  const [sortOrder, setSortOrder] = React.useState('readDesc');
-  const [activeCategory, setActiveCategory] = React.useState('全部分类');
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortOrder, setSortOrder] = useState('readDesc');
+  const [activeCategory, setActiveCategory] = useState('全部分类');
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      setIsLoading(true); 
+      try {
+        const categoriesResponse = await fetch('/data/benchmark-categories.json');
+        if (!categoriesResponse.ok) throw new Error('无法加载分类数据');
+        const categoriesData = await categoriesResponse.json();
+
+        const accountsResponse = await fetch('/data/benchmark-accounts.json');
+        if (!accountsResponse.ok) throw new Error('无法加载公众号数据');
+        const accountsData = await accountsResponse.json();
+
+        setCategories(categoriesData);
+        setAccounts(accountsData);
+
+      } catch (error) {
+        console.error('加载数据失败:', error);
+      } finally {
+        setIsLoading(false); 
+      }
+    };
+
+    loadData();
+  }, []);
+
+  const filteredAccounts = useMemo(() => {
+    let result = [...accounts];
+
+    if (activeCategory !== '全部分类') {
+      result = result.filter(account => account.category === activeCategory);
+    }
+
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase().trim(); 
+      if (query) { 
+        result = result.filter(account =>
+          account.name.toLowerCase().includes(query)
+        );
+      }
+    }
+
+    result.sort((a, b) => {
+      switch (sortOrder) {
+        case 'readDesc':
+          return b.readCount - a.readCount;
+        case 'readAsc':
+          return a.readCount - b.readCount;
+        case 'name':
+          return a.name.localeCompare(b.name, 'zh-CN');
+        default:
+          return b.readCount - a.readCount;
+      }
+    });
+
+    return result;
+  }, [accounts, activeCategory, searchQuery, sortOrder]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#1a2e3b] to-[#0f4a30] text-white">
-      <NavBar />
-
-      {/* 对标库内容区域 */}
-      <section className="flex-1 flex mt-16 p-6 gap-6">
-        {/* 左侧分类按钮 */}
-        <div className="w-64 space-y-2 bg-gray-800 bg-opacity-50 rounded-lg p-4">
-          <h3 className="text-xl font-bold mb-4 border-b border-gray-700 pb-2">公众号分类</h3>
-          <div className="grid grid-cols-2 gap-2">
-            {categories.map((category, index) => (
-            <Button
-              key={index}
-              variant="ghost"
-              className={`w-full justify-center text-center font-normal transition-colors rounded-lg py-2 ${activeCategory === category ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-gray-700/50 text-white hover:bg-gray-600'}`}
-              onClick={() => setActiveCategory(category)}
-            >
-              {category}
-            </Button>
-            ))}
-          </div>
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white p-4 sm:p-6 lg:p-8">
+      <section className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 lg:gap-8">
+        <div className="w-full lg:w-64 bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 flex flex-col flex-shrink-0 self-start lg:sticky lg:top-6"> 
+          <h3 className="text-lg font-semibold mb-4 text-center text-gray-200 border-b border-gray-700 pb-3"> 
+            分类导航
+          </h3>
+          {categories.length > 1 ? (
+            <div className="flex flex-col space-y-1 overflow-y-auto max-h-[calc(100vh-150px)] pr-1"> 
+              {categories.map((category, index) => {
+                const Icon = categoryIconMap[category] || GlobeAltIcon; 
+                return (
+                  <Button
+                    key={index}
+                    variant="ghost"
+                    size="sm"
+                    className={`w-full flex items-center justify-start text-left font-normal transition-colors rounded-lg py-2.5 px-3 text-sm gap-3 ${activeCategory === category ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-transparent text-gray-300 hover:bg-gray-700/50 hover:text-white'}`}
+                    onClick={() => setActiveCategory(category)}
+                  >
+                    <Icon className="w-5 h-5 flex-shrink-0" /> 
+                    <span className="truncate">{category}</span> 
+                  </Button>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="text-center text-gray-400">暂无分类数据</p> 
+          )}
         </div>
 
-        {/* 右侧卡片组 */}
-        <div className="flex-1">
-          <div className="mb-4 flex justify-between items-center">
-            <h3 className="text-xl font-bold">热门公众号</h3>
-            <div className="flex items-center">
-              <span className="mr-2">排序:</span>
+        <div className="flex-1 min-w-0">
+          <div className="mb-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-100">公众号对标参考</h1>
+            <div className="relative w-full sm:w-64">
+              <input
+                type="text"
+                placeholder="搜索公众号名称..."
+                className="bg-gray-700 text-white rounded-lg px-3 py-1.5 pl-8 w-full sm:w-64 focus:outline-none focus:ring-1 focus:ring-green-500"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <svg className="w-4 h-4 text-gray-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+
+            <div className="flex items-center w-full sm:w-auto">
+              <span className="mr-2 whitespace-nowrap">排序:</span>
               <select
-                className="bg-gray-700 text-white rounded p-1 focus:outline-none"
+                className="bg-gray-700 text-white rounded p-1.5 focus:outline-none w-full sm:w-auto"
                 value={sortOrder}
                 onChange={(e) => setSortOrder(e.target.value)}
               >
                 <option value="readDesc">阅读量 ↓</option>
                 <option value="readAsc">阅读量 ↑</option>
-                <option value="latest">最新更新</option>
                 <option value="name">名称排序</option>
               </select>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-            {accounts.map((account, index) => (
-            <div
-              key={index}
-              className="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer"
-              onClick={() => setSelectedAccount(account)}
-            >
-              <div className="p-4">
-                <div className="flex items-center mb-3">
-                  <img
-                    src={account.avatar}
-                    alt={account.name}
-                    className="w-10 h-10 rounded-full mr-3 object-cover"
-                  />
-                  <h4 className="font-bold text-white truncate">{account.name}</h4>
-                </div>
-                <div className="flex justify-between text-sm text-gray-300">
-                  <span>近7日阅读:</span>
-                  <span className="font-bold text-green-500">{(account.readCount / 10000).toFixed(1)}万+</span>
-                </div>
-                <div className="flex justify-between text-sm text-gray-300 mt-1">
-                  <span>更新频率:</span>
-                  <span>每日更新</span>
-                </div>
-                <div className="mt-3 text-sm text-gray-400 hover:text-gray-300 transition-colors">
-                  点击查看最近7天文章数据
-                </div>
-              </div>
+
+          {isLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
             </div>
-            ))}
-          </div>
+          ) : filteredAccounts.length === 0 ? (
+            <div className="flex justify-center items-center h-64 text-gray-400">
+              <p>没有找到符合条件的公众号</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+              {filteredAccounts.map((account, index) => (
+                <div
+                  key={`${account.name}-${index}`} 
+                  className="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer flex flex-col" 
+                  onClick={() => setSelectedAccount(account)}
+                >
+                  <div className="p-4 flex-grow"> 
+                    <div className="flex items-center mb-3">
+                      <img
+                        src={account.avatar || '/default-avatar.png'} 
+                        alt={account.name}
+                        className="w-10 h-10 rounded-full mr-3 object-cover flex-shrink-0" 
+                        onError={(e) => { e.currentTarget.src = '/default-avatar.png'; }} 
+                      />
+                      <h4 className="font-bold text-white truncate flex-1 min-w-0">{account.name}</h4> 
+                    </div>
+                    <div className="flex justify-between text-sm text-gray-300">
+                      <span>近7日阅读:</span>
+                      <span className="font-bold text-green-500 whitespace-nowrap">{(account.readCount / 10000).toFixed(1)}万+</span>
+                    </div>
+                    <div className="flex justify-between text-sm text-gray-300 mt-1">
+                      <span>分类:</span>
+                      <span className="truncate">{account.category}</span>
+                    </div>
+                  </div>
+                  <div className="px-4 pb-3 text-xs text-gray-400 hover:text-gray-300 transition-colors text-center border-t border-gray-700 pt-2 mt-auto"> 
+                    点击查看详情
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -321,4 +300,4 @@ export default function Benchmark() {
       )}
     </div>
   );
-};
+}
